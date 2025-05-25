@@ -1,0 +1,118 @@
+---
+description: Use this rule when a large feature is described or requested with mulitple steps and complex error/failure handling that requires more than 3 components, multi-phase implementation, cross-system integration, or coordination between frontend, backend, and external services.
+globs: 
+alwaysApply: false
+---
+# Rule: Big Feature Plan
+activation: agent requested
+description: >
+  Use this rule when a large feature is described or requested with multiple steps and complex error/failure handling that requires more than 3 components, multi-phase implementation, cross-system integration, or coordination between frontend, backend, and external services.
+
+when:
+  implementing: "features with multiple components across different areas"
+  building: "complex workflows with multiple phases"
+  creating: "features that span multiple files, directories, or systems"
+  requested: "functionality that requires significant planning and coordination"
+
+triggers:
+  - "Features requiring 5+ new components"
+  - "Multi-phase implementation processes"
+  - "Cross-system integrations (APIs, databases, third-party services)"
+  - "Features with complex user flows or state management"
+  - "Implementation requiring coordination between frontend/backend/external services"
+
+🛑 STOP AND PLAN FIRST 🛑
+
+do:
+  must:
+    - "🛑 STOP: Before writing ANY code, create a detailed feature plan"
+    - "📁 CHECK: Verify ./featureplan/ directory exists, create if needed"
+    - "🙈 GITIGNORE: Ensure ./featureplan/ is added to .gitignore (planning docs are temporary)"
+    - "📋 DOCUMENT: Create [feature-name]-plan.md in ./featureplan/ directory"
+    - "🗺️ PLAN: Include comprehensive step-by-step implementation roadmap"
+    - "📖 REFERENCE: Use feature plan as single source of truth during development"
+    - "✅ UPDATE: Mark phases complete as development progresses"
+    - "🗄️ ARCHIVE: Move to ./featureplan/completed/ when feature is fully implemented"
+
+  feature_plan_structure:
+    header:
+      - "Feature name and overview"
+      - "Goals and success criteria"
+      - "Dependencies and prerequisites"
+    phases:
+      - "Break down into logical development phases"
+      - "Define clear phase boundaries and completion criteria"
+      - "Identify phase dependencies and order"
+    components:
+      - "List all components/files to be created or modified"
+      - "Define component responsibilities and interfaces"
+      - "Document component relationships and data flow"
+    testing_strategy:
+      - "Test requirements for each phase"
+      - "Integration testing approach"
+      - "Success/failure scenario coverage"
+    architecture_notes:
+      - "Error handling strategies"
+      - "Performance considerations"
+      - "Security requirements"
+      - "Scalability planning"
+
+  file_naming:
+    format: "[feature-name]-plan.md"
+    examples:
+      - "application-submission-flow-plan.md"
+      - "user-authentication-plan.md"
+      - "payment-processing-plan.md"
+
+  during_development:
+    - "Reference feature plan for each phase implementation"
+    - "Update plan if requirements change or new insights emerge"
+    - "Mark completed phases with ✅ in the plan"
+    - "Document any deviations from original plan with reasoning"
+    - "Keep plan updated as single source of truth"
+
+  completion:
+    - "Verify all phases are marked complete"
+    - "Document any final architectural decisions"
+    - "Move plan to ./featureplan/completed/ directory"
+    - "Update main README with high-level feature summary if needed"
+
+  avoid:
+    - "Starting implementation without a detailed plan"
+    - "Skipping feature planning for 'simple' multi-component features"
+    - "Letting feature plans become outdated during development"
+    - "Committing temporary planning documents to git"
+
+directory_structure:
+  featureplan/
+    - "Active feature plans currently in development"
+    - "One markdown file per major feature"
+    - "Clear naming convention for easy identification"
+  featureplan/completed/
+    - "Archived plans for completed features"
+    - "Reference material for similar future features"
+    - "Historical record of implementation decisions"
+
+integration:
+  readme:
+    - "Keep high-level feature overview in main README"
+    - "Reference detailed plan location if needed"
+    - "Avoid duplicating detailed implementation steps"
+  
+  cursor_rules:
+    - "Cross-reference with test-driven-design-rule"
+    - "Coordinate with multi-file-change rule"
+    - "Align with minimal-code-changes principle"
+
+benefits:
+  - "Reduces implementation complexity by breaking into phases"
+  - "Provides clear roadmap for complex features"
+  - "Enables better time estimation and progress tracking"
+  - "Creates reusable documentation for similar features"
+  - "Improves code quality through upfront planning"
+  - "Facilitates team coordination on large features"
+
+example:
+  trigger: "User requests: 'Add complete payment processing with Stripe integration'"
+  response: "🛑 This is a complex feature requiring multiple components. Let me create a feature plan first..."
+  action: "Create payment-processing-plan.md with phases, components, testing strategy, and architecture notes"

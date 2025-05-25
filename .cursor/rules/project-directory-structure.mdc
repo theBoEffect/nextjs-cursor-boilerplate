@@ -1,0 +1,90 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Rule: Project Directory Structure
+description: >
+  Documents the main project directory structure, their purposes, and relationships.
+
+project_root:
+  directories:
+    .cursor:
+      purpose: "Contains IDE-specific rules and configurations"
+      contents:
+        - rules/: "Directory containing project-specific documentation and conventions"
+    
+    src:
+      purpose: "Contains all source code for the Next.js boilerplate"
+      scope: "Any and all pages, directories, functionality, and so on."
+      conventions:
+        - "Components should be in PascalCase"
+        - "Utility functions should be in camelCase"
+        - "Each component should have its own directory if it requires multiple files"
+        - "Client and server functionality should be separated by directory whenever possible"
+        - "Organize code by feature/domain rather than technical layer"
+        - "Feature-specific code goes in src/features, global code in src root directories"
+        - "Each feature should contain its own __tests__ directory for feature-specific tests"
+      contents:
+        app/: "Next.js app router structure with pages, layouts, and API routes"
+        features/: "Feature-specific code organized by domain/page"
+        features/home/: "Landing page feature with its own components, hooks, utils, types, and tests"
+        features/home/__tests__/: "Tests specific to the home feature, organized by component/hook/util"
+        features/shared/: "Global features that span multiple pages or are reusable across features"
+        features/shared/__tests__/: "Tests for shared features and utilities"
+        components/: "Global reusable UI components using shadcn/ui and Tailwind"
+        components/ui/: "shadcn/ui component library"
+        lib/: "Global utility functions, OpenAI client, HubSpot client, email services"
+        types/: "Global TypeScript type definitions for the application"
+        hooks/: "Global React hooks for shared functionality"
+        __tests__/: "Global test setup and integration tests"
+
+conventions:
+  general:
+    - "Use TypeScript for type safety"
+    - "Use Tailwind CSS with clsx for styling"
+    - "Follow Next.js' official best practices"
+    - "Keep components small and focused"
+    - "Maintain clear separation between UI components and business logic"
+    - "Organize by feature first, then by technical concern"
+  routing:
+    - "Use Next.js app router with route groups for organization"
+    - "Route files in src/app should be thin - only import and render from features"
+    - "Landing page at root (/) imports from features/home"
+    - "features components imports from features/"
+    - "API routes under /api for required features"
+    - "Protected routes for admin functionality if needed"
+  features:
+    - "Each feature should contain its own components, hooks, utils, and types"
+    - "Each feature should have its own __tests__ directory"
+    - "Feature directories mirror page structure when applicable"
+    - "Global/shared functionality goes in src/features/shared"
+    - "Import from features using relative paths within the feature"
+    - "Import global utilities from src/lib, src/components, etc."
+    - "Route files should only import the main page component from the corresponding feature"
+  testing:
+    - "Feature-specific tests go in the feature's __tests__ directory"
+    - "Global/integration tests go in src/__tests__"
+    - "Organize tests to mirror the structure they test (components/, hooks/, utils/)"
+    - "Tests should be co-located with the business logic they verify"
+
+do:
+  must:
+    - "Place all source code in the src directory"
+    - "Keep route files in src/app thin - only import and render from features"
+    - "Place all business logic in appropriate feature directories"
+    - "Use server components for data fetching where possible"
+    - "Use client components only when interactivity is required"
+    - "Implement proper error boundaries for async operations"
+    - "Follow test-driven development with Vitest"
+    - "Organize new features in src/features with appropriate subdirectories"
+    - "Place feature-specific tests in the feature's __tests__ directory"
+    - "Document any new directories or major structural changes"
+  avoid:
+    - "NEVER mix source code with build output"
+    - "NEVER place source files outside of src directory"
+    - "NEVER put business logic in route files - keep them thin"
+    - "NEVER put API keys or sensitive data in client-side code"
+    - "NEVER make synchronous calls to external APIs in render functions"
+    - "NEVER organize by technical layer when feature organization is more appropriate"
+    - "NEVER place feature-specific tests in global test directories"

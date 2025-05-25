@@ -1,0 +1,293 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Rule: API Development
+activation: manual
+description: >
+  Guidelines for building robust, secure, and maintainable API routes in Next.js
+  with proper error handling, validation, and response patterns. API routes should
+  be thin and delegate business logic to feature modules.
+
+when:
+  creating: "API routes"
+  building: "backend functionality"
+  handling: "external API integrations"
+
+do:
+  must:
+    - "Keep API routes thin - only handle HTTP concerns and delegate to features"
+    - "Place business logic in src/features/[feature-name]/ directories"
+    - "Validate all input data using zod or similar validation library"
+    - "Implement proper error handling with consistent error responses"
+    - "Use appropriate HTTP status codes for different scenarios"
+    - "Sanitize and validate environment variables"
+    - "Implement rate limiting for public endpoints"
+    - "Use TypeScript for all API route handlers"
+    - "Handle async operations with proper error catching"
+  
+  prefer:
+    - "Feature-based organization over technical layer organization"
+    - "Centralized error handling middleware"
+    - "Consistent API response format across all endpoints"
+    - "Input validation at the route handler level"
+    - "Proper logging for debugging and monitoring"
+    - "Authentication middleware for protected routes"
+  
+  avoid:
+    - "Putting business logic directly in API route files"
+    - "Exposing internal error details to clients"
+    - "Missing input validation on API endpoints"
+    - "Inconsistent response formats across endpoints"
+    - "Hardcoded configuration values in API routes"
+    - "Synchronous operations that could block the event loop"
+
+architecture_patterns:
+  thin_api_routes: |
+    // app/api/users/route.ts (THIN - only HTTP concerns)
+    import { NextRequest, NextResponse } from 'next/server'
+    import { createUser } from '@/features/users/services/userService'
+    import { createUserSchema } from '@/features/users/schemas/userSchemas'
+    import { handleApiError } from '@/lib/api-utils'
+    
+    export async function POST(request: NextRequest) {
+      try {
+        const body = await request.json()
+        const validatedData = createUserSchema.parse(body)
+        
+        // Delegate to feature business logic
+        const user = await createUser(validatedData)
+        
+        return NextResponse.json(
+          { success: true, data: user },
+          { status: 201 }
+        )
+      } catch (error) {
+        return handleApiError(error)
+      }
+    }
+  
+  feature_business_logic: |
+    // features/users/services/userService.ts (BUSINESS LOGIC)
+    import { db } from '@/lib/database'
+    import { CreateUserInput } from '../types/userTypes'
+    import { hashPassword } from '../utils/passwordUtils'
+    
+    export async function createUser(input: CreateUserInput) {
+      // Business logic lives here
+      const hashedPassword = await hashPassword(input.password)
+      
+      const user = await db.user.create({
+        data: {
+          ...input,
+          password: hashedPassword,
+        },
+      })
+      
+      // Don't return password
+      const { password, ...safeUser } = user
+      return safeUser
+    }
+  
+  feature_schemas: |
+    // features/users/schemas/userSchemas.ts
+    import { z } from 'zod'
+    
+    export const createUserSchema = z.object({
+      name: z.string().min(1),
+      email: z.string().email(),
+      password: z.string().min(8),
+    })
+    
+    export const updateUserSchema = z.object({
+      name: z.string().min(1).optional(),
+      email: z.string().email().optional(),
+    }).refine(data => Object.keys(data).length > 0, {
+      message: "At least one field must be provided"
+    })
+
+feature_organization:
+  directory_structure: |
+    src/features/users/
+    ├── components/          # User-related UI components
+    ├── hooks/              # User-related React hooks
+    ├── services/           # Business logic and API calls
+    │   ├── userService.ts  # Core user operations
+    │   └── authService.ts  # Authentication logic
+    ├── schemas/            # Zod validation schemas
+    │   └── userSchemas.ts  # User input validation
+    ├── types/              # TypeScript types
+    │   └── userTypes.ts    # User-related types
+    ├── utils/              # Feature-specific utilities
+    │   └── passwordUtils.ts # Password hashing, etc.
+    └── __tests__/          # Feature tests
+        ├── services/       # Service tests
+        ├── utils/          # Utility tests
+        └── components/     # Component tests
+
+error_handling:
+  centralized_handler: |
+    // lib/api-utils.ts
+    import { NextResponse } from 'next/server'
+    import { ZodError } from 'zod'
+    
+    export function handleApiError(error: unknown) {
+      if (error instanceof ZodError) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: 'Validation failed',
+            details: error.errors 
+          },
+          { status: 400 }
+        )
+      }
+      
+      if (error instanceof Error) {
+        console.error('API Error:', error)
+        return NextResponse.json(
+          { success: false, error: 'Internal server error' },
+          { status: 500 }
+        )
+      }
+      
+      return NextResponse.json(
+        { success: false, error: 'Unknown error' },
+        { status: 500 }
+      )
+    }
+
+testing_patterns:
+  feature_service_tests: |
+    // features/users/__tests__/services/userService.test.ts
+    import { describe, it, expect, vi } from 'vitest'
+    import { createUser } from '../../services/userService'
+    
+    // Mock database
+    vi.mock('@/lib/database', () => ({
+      db: {
+        user: {
+          create: vi.fn(),
+        },
+      },
+    }))
+    
+    describe('userService', () => {
+      describe('createUser', () => {
+        it('should create user with hashed password', async () => {
+          const input = {
+            name: 'John Doe',
+            email: 'john@example.com',
+            password: 'password123',
+          }
+          
+          const result = await createUser(input)
+          
+          expect(result).not.toHaveProperty('password')
+          expect(result.email).toBe(input.email)
+        })
+      })
+    })
+  
+  api_route_tests: |
+    // features/users/__tests__/api/userRoutes.test.ts
+    import { describe, it, expect } from 'vitest'
+    import { POST } from '@/app/api/users/route'
+    
+    describe('/api/users', () => {
+      it('should create a user with valid data', async () => {
+        const request = new Request('http://localhost:3000/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'John Doe',
+            email: 'john@example.com',
+            password: 'password123',
+          }),
+        })
+        
+        const response = await POST(request)
+        const data = await response.json()
+        
+        expect(response.status).toBe(201)
+        expect(data.success).toBe(true)
+        expect(data.data).toHaveProperty('id')
+        expect(data.data).not.toHaveProperty('password')
+      })
+    })
+
+example:
+  complete_feature_api: |
+    // 1. API Route (THIN)
+    // app/api/posts/route.ts
+    import { NextRequest, NextResponse } from 'next/server'
+    import { createPost, getPosts } from '@/features/posts/services/postService'
+    import { createPostSchema, getPostsSchema } from '@/features/posts/schemas/postSchemas'
+    import { handleApiError } from '@/lib/api-utils'
+    
+    export async function GET(request: NextRequest) {
+      try {
+        const { searchParams } = new URL(request.url)
+        const query = getPostsSchema.parse(Object.fromEntries(searchParams))
+        
+        const posts = await getPosts(query)
+        
+        return NextResponse.json({
+          success: true,
+          data: posts,
+        })
+      } catch (error) {
+        return handleApiError(error)
+      }
+    }
+    
+    export async function POST(request: NextRequest) {
+      try {
+        const body = await request.json()
+        const validatedData = createPostSchema.parse(body)
+        
+        const post = await createPost(validatedData)
+        
+        return NextResponse.json(
+          { success: true, data: post },
+          { status: 201 }
+        )
+      } catch (error) {
+        return handleApiError(error)
+      }
+    }
+    
+    // 2. Feature Service (BUSINESS LOGIC)
+    // features/posts/services/postService.ts
+    import { db } from '@/lib/database'
+    import { CreatePostInput, GetPostsQuery } from '../types/postTypes'
+    
+    export async function createPost(input: CreatePostInput) {
+      return await db.post.create({
+        data: input,
+        include: {
+          author: {
+            select: { id: true, name: true, email: true }
+          }
+        }
+      })
+    }
+    
+    export async function getPosts(query: GetPostsQuery) {
+      return await db.post.findMany({
+        where: query.search ? {
+          OR: [
+            { title: { contains: query.search } },
+            { content: { contains: query.search } }
+          ]
+        } : {},
+        skip: (query.page - 1) * query.limit,
+        take: query.limit,
+        include: {
+          author: {
+            select: { id: true, name: true, email: true }
+          }
+        }
+      })
+    }

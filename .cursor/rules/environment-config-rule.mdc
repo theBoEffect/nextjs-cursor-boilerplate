@@ -1,0 +1,197 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Rule: Environment & Configuration Management
+activation: always
+description: >
+  Guidelines for managing environment variables, API keys, and configuration
+  in Next.js applications with proper security and development practices.
+
+when:
+  working_with: "environment variables"
+  configuring: "API keys or secrets"
+  setting_up: "external services"
+
+do:
+  must:
+    - "NEVER commit actual API keys or secrets to version control"
+    - "Use .env.local for local development secrets"
+    - "Provide .env.example with placeholder values for all required variables"
+    - "Use NEXT_PUBLIC_ prefix only for client-side environment variables"
+    - "Validate environment variables at application startup"
+    - "Use process.env only in server-side code or API routes"
+  
+  prefer:
+    - "Environment-specific configuration files when needed"
+    - "Type-safe environment variable validation with zod or similar"
+    - "Centralized configuration management in src/lib/config.ts"
+    - "Clear documentation of what each environment variable does"
+  
+  avoid:
+    - "Hardcoding API keys or URLs in source code"
+    - "Using NEXT_PUBLIC_ for sensitive information"
+    - "Accessing process.env directly in client components"
+    - "Missing validation for required environment variables"
+
+security_practices:
+  api_keys:
+    - "Store API keys in environment variables, never in code"
+    - "Use different API keys for development, staging, and production"
+    - "Rotate API keys regularly and update them in all environments"
+    - "Use least-privilege access for API keys when possible"
+  
+  client_vs_server:
+    - "Server-only secrets: DATABASE_URL, API_KEYS, WEBHOOK_SECRETS"
+    - "Client-safe variables: NEXT_PUBLIC_APP_URL, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"
+    - "Never expose server secrets to the client bundle"
+
+configuration_patterns:
+  env_validation: |
+    // src/lib/config.ts
+    import { z } from 'zod'
+    
+    const envSchema = z.object({
+      OPENAI_API_KEY: z.string().min(1),
+      DATABASE_URL: z.string().url(),
+      NEXTAUTH_SECRET: z.string().min(32),
+      NEXT_PUBLIC_APP_URL: z.string().url(),
+    })
+    
+    export const env = envSchema.parse(process.env)
+  
+  config_object: |
+    // src/lib/config.ts
+    export const config = {
+      openai: {
+        apiKey: process.env.OPENAI_API_KEY!,
+        model: process.env.OPENAI_MODEL || 'gpt-4',
+      },
+      database: {
+        url: process.env.DATABASE_URL!,
+      },
+      app: {
+        url: process.env.NEXT_PUBLIC_APP_URL!,
+        environment: process.env.NODE_ENV,
+      },
+    } as const
+
+development_setup:
+  local_environment:
+    - "Copy .env.example to .env.local for local development"
+    - "Never commit .env.local to version control"
+    - "Use different database/API endpoints for development"
+    - "Document setup steps in README.md"
+  
+  team_sharing:
+    - "Keep .env.example up to date with all required variables"
+    - "Document where to obtain API keys and credentials"
+    - "Provide default values for non-sensitive configuration"
+    - "Include setup instructions for new team members"
+
+deployment_considerations:
+  production_setup:
+    - "Set environment variables in deployment platform (Vercel, Netlify, etc.)"
+    - "Use different secrets for each environment"
+    - "Enable environment variable validation in production builds"
+    - "Monitor for missing or invalid environment variables"
+  
+  ci_cd:
+    - "Use encrypted secrets in GitHub Actions or similar"
+    - "Validate environment variables in CI/CD pipeline"
+    - "Use different API keys for testing environments"
+
+common_variables:
+  required_for_nextjs:
+    - "NEXTAUTH_SECRET: Random string for NextAuth.js session encryption"
+    - "NEXTAUTH_URL: Base URL of your application"
+    - "DATABASE_URL: Connection string for your database"
+  
+  ai_integration:
+    - "OPENAI_API_KEY: OpenAI API key for AI features"
+    - "OPENAI_ORG_ID: OpenAI organization ID (optional)"
+  
+  external_services:
+    - "STRIPE_SECRET_KEY: Stripe secret key for payments"
+    - "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: Stripe publishable key"
+    - "RESEND_API_KEY: Resend API key for email sending"
+    - "HUBSPOT_API_KEY: HubSpot API key for CRM integration"
+
+example:
+  env_example_file: |
+    # .env.example
+    # Copy this file to .env.local and fill in your actual values
+    
+    # OpenAI Configuration
+    OPENAI_API_KEY=sk-your-openai-api-key-here
+    
+    # Database
+    DATABASE_URL=postgresql://username:password@localhost:5432/dbname
+    
+    # NextAuth.js
+    NEXTAUTH_SECRET=your-32-character-secret-here
+    NEXTAUTH_URL=http://localhost:3000
+    
+    # External APIs
+    STRIPE_SECRET_KEY=sk_test_your-stripe-secret-key
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your-stripe-publishable-key
+  
+  config_usage: |
+    // In API route or server component
+    import { config } from '@/lib/config'
+    
+    const openai = new OpenAI({
+      apiKey: config.openai.apiKey,
+    })
+    
+    // In client component
+    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+
+feature_integration:
+  api_route_usage: |
+    // app/api/users/route.ts (thin API route)
+    import { config } from '@/lib/config'
+    import { createUser } from '@/features/users/services/userService'
+    
+    export async function POST(request: NextRequest) {
+      // Use global config in thin API routes
+      const result = await createUser(data, config.database.url)
+      return NextResponse.json({ success: true, data: result })
+    }
+  
+  feature_service_usage: |
+    // features/ai/services/openaiService.ts (feature business logic)
+    import { config } from '@/lib/config'
+    import OpenAI from 'openai'
+    
+    const openai = new OpenAI({
+      apiKey: config.openai.apiKey,
+    })
+    
+    export async function generateResponse(prompt: string) {
+      // Business logic uses global config
+      return await openai.chat.completions.create({
+        model: config.openai.model,
+        messages: [{ role: 'user', content: prompt }],
+      })
+    }
+  
+  feature_client_usage: |
+    // features/payments/components/CheckoutForm.tsx (client component)
+    import { loadStripe } from '@stripe/stripe-js'
+    
+    // Only use NEXT_PUBLIC_ variables in client components
+    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+    
+    export function CheckoutForm() {
+      // Client-side payment logic
+    }
+
+violations:
+  never_do:
+    - "const apiKey = 'sk-1234567890abcdef' // NEVER hardcode API keys"
+    - "process.env.SECRET_KEY in client components // Server secrets in client code"
+    - "Committing .env.local or .env files with real secrets"
+    - "Using NEXT_PUBLIC_ for sensitive server-side configuration"
+    - "Accessing process.env directly in feature components // Use global config instead"

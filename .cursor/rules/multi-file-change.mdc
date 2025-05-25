@@ -1,0 +1,27 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Rule: Multi-file Change
+description: >
+  Before making changes that span multiple files, list all files, explain changes per file,
+  provide reasoning, and wait for explicit approval.
+
+when:
+  language: "*"
+  path: "**/*"
+
+do:
+  must:
+    - "List all files to be modified"
+    - "Explain specific changes required in each file"
+    - "Provide rationale for each change"
+    - "ensure you are recommending the least code changes possible"
+    - "Wait for explicit approval before proceeding"
+
+example:
+  - before: |
+      // Multiple files changed without overview or explanation
+  - after: |
+      // Comprehensive list and explanation of changes submitted for review before implementation

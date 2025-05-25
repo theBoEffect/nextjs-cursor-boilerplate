@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Rule: File Movement
+description: >
+  When you need to move a file, ensure that you use system file operations for moving files, preserving history, and updating references accordingly, rather than attempting to create a new file that you then re-enter code into from memory.
+
+do:
+  must:
+    - "Use system commands like `mv` or `cp` for moving or copying files"
+    - "Verify the source file exists before moving"
+    - "Update all related imports and references after moving files"
+    - "Preserve file history by preferring move operations over create-and-delete"
+    - "Check for similar functionality before creating new files"
+  avoid:
+    - "creating a brand new file and attempting to recreate the code from memory"

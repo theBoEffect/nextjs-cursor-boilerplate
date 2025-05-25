@@ -1,0 +1,118 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Rule: Cursor AI Optimization
+activation: always
+description: >
+  Guidelines for maximizing effectiveness when working with Cursor AI, including
+  prompting best practices, code organization, and AI-assisted development patterns.
+
+when:
+  working_with: "Cursor AI"
+  developing: "any feature or component"
+  debugging: "issues or errors"
+
+do:
+  must:
+    - "Provide clear, specific prompts with context about the desired outcome"
+    - "Include relevant file paths and line numbers when referencing existing code"
+    - "Specify the exact technology stack and versions being used"
+    - "Break down complex requests into smaller, focused tasks"
+    - "Use descriptive variable and function names that explain their purpose"
+    - "Add inline comments for complex business logic"
+    - "Structure code in a way that's easy for AI to understand and modify"
+  
+  prefer:
+    - "Explicit type definitions over implicit types"
+    - "Pure functions over stateful implementations when possible"
+    - "Clear separation of concerns between components"
+    - "Consistent naming conventions throughout the project"
+    - "Well-documented interfaces and API contracts"
+  
+  avoid:
+    - "Vague prompts like 'fix this' or 'make it better'"
+    - "Overly complex nested structures that are hard to parse"
+    - "Magic numbers or strings without explanation"
+    - "Tightly coupled components that are difficult to modify independently"
+
+prompting_best_practices:
+  effective_prompts:
+    - "Add a loading spinner to the UserProfile component in src/features/user/components/UserProfile.tsx"
+    - "Create a custom hook for managing form state with validation in src/features/contact/hooks/useContactForm.ts"
+    - "Implement error boundary for the dashboard page in src/features/dashboard/components/DashboardErrorBoundary.tsx"
+    - "Add TypeScript types for the API response in src/features/users/types/userTypes.ts"
+  
+  context_providing:
+    - "Include the current file structure when asking for new components"
+    - "Mention existing patterns and conventions used in the project"
+    - "Specify the target user experience or behavior"
+    - "Reference related components or utilities that should be considered"
+
+code_organization:
+  ai_friendly_patterns:
+    - "Use explicit imports instead of barrel exports for better context"
+    - "Keep components focused on a single responsibility"
+    - "Use descriptive prop interfaces with JSDoc comments"
+    - "Implement consistent error handling patterns"
+    - "Structure folders by feature rather than technical layer"
+    - "Co-locate related files (components, hooks, utils, types) within features"
+  
+  documentation:
+    - "Add JSDoc comments for complex functions and components"
+    - "Include usage examples in component documentation"
+    - "Document expected props and their purposes"
+    - "Explain business logic and edge cases in comments"
+
+debugging_with_ai:
+  effective_debugging:
+    - "Provide the full error message and stack trace"
+    - "Include the relevant code context (not just the failing line)"
+    - "Describe what you expected to happen vs. what actually happened"
+    - "Mention any recent changes that might be related"
+    - "Include browser console errors or network request failures"
+  
+  information_to_include:
+    - "Browser and version (for frontend issues)"
+    - "Node.js version (for backend issues)"
+    - "Package versions for relevant dependencies"
+    - "Environment (development, staging, production)"
+
+collaboration_patterns:
+  iterative_development:
+    - "Start with a minimal working implementation"
+    - "Add features incrementally with AI assistance"
+    - "Test each change before moving to the next feature"
+    - "Use AI to help refactor and improve existing code"
+  
+  code_review_with_ai:
+    - "Ask AI to review code for potential issues or improvements"
+    - "Use AI to suggest performance optimizations"
+    - "Get AI assistance for accessibility improvements"
+    - "Ask for security review of authentication and data handling"
+
+example:
+  good_prompt: |
+    "I need to add form validation to the ContactForm component in src/features/contact/components/ContactForm.tsx. 
+    The form should validate email format, required fields (name, email, message), and show error messages 
+    below each field. Use react-hook-form with zod validation to match the existing pattern used in 
+    src/features/auth/components/LoginForm.tsx."
+  
+  poor_prompt: |
+    "Add validation to the form"
+
+feature_based_examples:
+  component_creation: |
+    "Create a UserCard component in src/features/users/components/UserCard.tsx that displays user avatar, 
+    name, and email. Include TypeScript props interface in src/features/users/types/userTypes.ts and 
+    add tests in src/features/users/__tests__/components/UserCard.test.tsx."
+  
+  hook_creation: |
+    "Create a useUserData hook in src/features/users/hooks/useUserData.ts that fetches user information 
+    from the API. Include error handling and loading states, with tests in 
+    src/features/users/__tests__/hooks/useUserData.test.ts."
+  
+  service_creation: |
+    "Add a getUserById function to src/features/users/services/userService.ts that calls the API endpoint. 
+    Include proper error handling and TypeScript types from src/features/users/types/userTypes.ts."

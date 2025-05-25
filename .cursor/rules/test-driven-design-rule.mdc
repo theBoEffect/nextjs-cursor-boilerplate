@@ -1,0 +1,87 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Rule: Test-Driven Design
+activation: always
+description: >
+  When implementing new features, write unit tests with Vitest first to ensure we're building 
+  the right functionality and protecting against future regressions.
+
+when:
+  implementing: "new features"
+  modifying: "existing functionality"
+
+🚨 STOP AND WRITE TESTS FIRST 🚨
+
+process:
+  1. "🛑 BEFORE writing ANY implementation code: Write unit tests with Vitest that define the expected behavior"
+  2. "Submit tests for review and approval before proceeding"
+  3. "Only after approval: implement the feature to pass the tests"
+  4. "Ensure all tests pass before considering the feature complete"
+
+mandatory_triggers:
+  before_creating_new_components:
+    - "🚨 STOP: Write tests for this component first"
+    - "Define what the component should render, handle, and expose"
+    - "Test user interactions, form submissions, navigation, etc."
+  
+  before_creating_new_pages:
+    - "🚨 STOP: Write tests for this page first"
+    - "Test routing, data loading, form handling, and user flows"
+    - "Especially critical for forms with multiple fields"
+  
+  before_adding_business_logic:
+    - "🚨 STOP: Write tests for this logic first"
+    - "Test all code paths, edge cases, and error conditions"
+    - "Mock external dependencies and API calls"
+
+  before_form_implementations:
+    - "🚨 STOP: Forms are complex - write comprehensive tests first"
+    - "Test field validation, submission handling, error states"
+    - "Test all form interactions and state changes"
+
+do:
+  must:
+    - "🛑 NEVER write implementation code before tests are written and approved"
+    - "Write tests before writing implementation code"
+    - "Cover core functionality and edge cases"
+    - "Use descriptive test names that explain the expected behavior"
+    - "Wait for explicit approval of tests before implementing features"
+    - "Ensure tests are focused and test one thing at a time"
+    - "Mock external dependencies (OpenAI, HubSpot, email services)"
+  prefer:
+    - "Testing user-facing behavior over implementation details"
+    - "Integration tests for API routes and form submissions"
+    - "Component tests for UI interactions and state management"
+  avoid:
+    - "Writing implementation code before tests are approved"
+    - "Over-testing internal implementation details"
+    - "Tests that are too broad or test multiple concerns"
+    - "🚨 NEVER skip tests because 'it's just a simple component'"
+
+coverage:
+  minimum:
+    - "Core business logic functions"
+    - "API route handlers"
+    - "Form validation and submission logic"
+    - "OpenAI integration points"
+    - "Error handling scenarios"
+    - "🚨 ALL new components and pages must have tests"
+  optional:
+    - "UI component rendering (when complex logic is involved)"
+    - "Hook behavior for state management"
+
+example:
+  workflow: |
+    1. User requests: "Add validation for startup revenue field"
+    2. 🛑 STOP: Write test first: "should reject negative revenue values"
+    3. Submit test for approval
+    4. After approval: implement validation logic
+    5. Verify test passes
+
+violation_consequences:
+  - "If tests are not written first, implementation must be reverted"
+  - "User will correctly call out TDD rule violations"
+  - "Always acknowledge the mistake and write tests before proceeding"

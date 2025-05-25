@@ -1,0 +1,111 @@
+---
+description: Use this rule when there are unit test failures of any kind — including failed assertions, test errors, stack traces, or any other failed test output.
+globs: 
+alwaysApply: false
+---
+# Rule: Unit Test Management
+description: >
+  Establishes comprehensive practices for unit test management, ensuring test reliability, 
+  systematic issue resolution, and continuous test suite health.
+
+when:
+  running: "tests"
+  modifying: "code that affects existing tests"
+  encountering: "test failures"
+
+do:
+  must:
+    - "🛑 STOP: Address ALL failed tests before implementing new features or code changes"
+    - "Use `yarn test --run` flag to avoid CLI hanging and waiting for user input"
+    - "Systematically address each broken test when code changes break multiple tests"
+    - "Determine root cause of test failures before attempting fixes"
+    - "Account for all test changes and verify they align with intended functionality"
+    - "Ensure test isolation - each test should be independent and not rely on others"
+    - "Clean up mocks and restore state in beforeEach/afterEach hooks"
+    - "Reference the TDD rule when implementing new features"
+
+  process_for_failed_tests:
+    1. "🔍 ANALYZE: Identify the root cause of each test failure"
+    2. "📝 CATEGORIZE: Determine if failure is due to:"
+       - "Bug in implementation code"
+       - "Outdated test expectations"
+       - "Test setup/teardown issues"
+       - "Missing mocks or dependencies"
+       - "Test is no longer applicable"
+    3. "🔧 RESOLVE: Based on category:"
+       - "Bug: Fix the implementation code"
+       - "Outdated: Update test expectations to match new behavior"
+       - "Setup: Fix test configuration or mocks"
+       - "Not applicable: Remove or skip test with clear comment explaining why"
+    4. "✅ VERIFY: Ensure fix doesn't break other tests"
+    5. "📊 VALIDATE: Run full test suite to confirm overall health"
+
+  process_for_multiple_breakages:
+    1. "🛑 STOP: Do not continue coding until all broken tests are addressed"
+    2. "📋 LIST: Document all failing tests and their error messages"
+    3. "🎯 PRIORITIZE: Address tests in logical groups (by feature/component)"
+    4. "🔍 INSPECT: Check if you made unintended changes in wrong files"
+    5. "🔄 ITERATE: Fix one test group at a time, and within each group:"
+       - "Fix ONE test at a time"
+       - "Run tests after each individual fix to verify success"
+       - "Ensure the fix doesn't break other tests before moving to next test"
+       - "Only proceed to next test once current test is fully resolved"
+    6. "🛡️ PREVENT: Identify what caused the widespread breakage and add safeguards"
+
+  avoid:
+    - "NEVER ignore or postpone failed tests"
+    - "NEVER make new code changes while tests are failing"
+    - "NEVER run tests without --run flag in automated/scripted contexts"
+    - "NEVER fix tests by simply commenting them out without justification"
+    - "NEVER assume test failures are 'just flaky' without investigation"
+    - "NEVER make changes to test files without understanding the impact"
+
+test_quality_standards:
+  naming:
+    - "Use descriptive test names that explain the expected behavior"
+    - "Follow pattern: 'should [expected behavior] when [condition]'"
+    - "Group related tests with consistent describe() blocks"
+  
+  structure:
+    - "Arrange-Act-Assert pattern for test organization"
+    - "One assertion concept per test (avoid testing multiple unrelated things)"
+    - "Use beforeEach/afterEach for setup/cleanup consistently"
+  
+  mocking:
+    - "Mock external dependencies and API calls"
+    - "Clear all mocks in beforeEach to ensure test isolation"
+    - "Verify mock calls when testing interaction behavior"
+  
+  coverage:
+    - "Prioritize testing user-facing behavior over implementation details"
+    - "Ensure core business logic has comprehensive test coverage"
+    - "Test error conditions and edge cases"
+
+performance_considerations:
+  - "Keep individual tests fast (< 100ms when possible)"
+  - "Use test.skip() for temporarily disabled tests with explanation"
+  - "Avoid unnecessary async operations in tests"
+  - "Clean up timers and async operations in test teardown"
+
+integration_with_tdd:
+  - "Reference and follow the existing TDD rule for new feature development"
+  - "This rule focuses on maintaining existing test health"
+  - "Both rules work together to ensure robust testing practices"
+
+violation_consequences:
+  - "Code changes with failing tests will be reverted"
+  - "Multiple test breakages require systematic resolution before proceeding"
+  - "Persistent test failures indicate need for process improvement"
+
+examples:
+  good_practice: |
+    // Before making any changes, run tests
+    yarn test --run
+    
+    // If tests fail, investigate and fix before proceeding
+    // ✅ All tests passing - proceed with development
+    
+  bad_practice: |
+    // ❌ Implementing new features while tests are red
+    // ❌ Using yarn test without --run flag in scripts
+    // ❌ Commenting out failing tests without investigation

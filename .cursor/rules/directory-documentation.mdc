@@ -1,0 +1,26 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Rule: Directory Documentation
+description: >
+  When a new directory is created (except `./.cursor` directories), prompt to add documentation
+  describing the directory's purpose, scope, relationships, file types, and conventions as a new cursor IDE rule under ./.cursor/rules/the-new-directory-rule.mdc
+
+do:
+  must:
+    - "Prompt for a new rule documenting:"
+    - " - Directory's purpose and scope"
+    - " - Relationship to other directories"
+    - " - Types of files/code it contains"
+    - " - Any patterns or conventions used"
+    - "create the rule under ./.cursor/rules as a .mdc cursor IDE file"
+  avoid:
+    - "Creating undocumented directories that contribute to sprawl"
+
+example:
+  - before: |
+      // New directory added without documentation
+  - after: |
+      // Documentation rule created describing the directory's role and usage

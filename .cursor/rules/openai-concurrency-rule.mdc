@@ -1,0 +1,80 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Rule: OpenAI Concurrency
+description: >
+  When making calls to OpenAI, build concurrent and asynchronous implementations unless 
+  serialization is explicitly required by the business logic.
+
+when:
+  integrating: "OpenAI API calls"
+  building: "real-time scoring and suggestions"
+  implementing: "application analysis features"
+
+do:
+  must:
+    - "Use Promise.all() or Promise.allSettled() for independent OpenAI calls"
+    - "Implement async/await patterns for all OpenAI interactions"
+    - "Build UI components with loading states for each concurrent operation"
+    - "Handle individual call failures gracefully without blocking others"
+    - "Provide fallback behavior when API calls fail"
+  prefer:
+    - "Streaming responses when supported by OpenAI API"
+    - "Optimistic UI updates while calls are in progress"
+    - "Independent error handling for each concurrent operation"
+    - "Timeout handling for long-running requests"
+  avoid:
+    - "Sequential API calls unless order dependency exists"
+    - "Blocking the UI while waiting for OpenAI responses"
+    - "Single point of failure for multiple API operations"
+
+patterns:
+  concurrent_scoring: |
+    // Multiple form fields scored simultaneously
+    const [revenueScore, teamScore, marketScore] = await Promise.allSettled([
+      scoreRevenue(data.revenue),
+      scoreTeam(data.teamDescription), 
+      scoreMarket(data.marketAnalysis)
+    ]);
+
+  streaming_analysis: |
+    // Real-time analysis with streaming
+    const stream = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [...],
+      stream: true
+    });
+
+ui_patterns:
+  loading_states:
+    - "Show individual loading indicators for each concurrent operation"
+    - "Display partial results as they become available"
+    - "Maintain interactivity during background operations"
+  error_handling:
+    - "Display specific error messages for failed operations"
+    - "Allow retry of individual failed operations"
+    - "Continue showing successful results when some operations fail"
+
+exceptions:
+  serialize_when:
+    - "Explicit requirement states operations must be sequential"
+    - "Later API calls depend on results from earlier calls"
+    - "Rate limiting requires controlled sequential execution"
+    - "Business logic requires specific ordering of operations"
+
+example:
+  avoid: |
+    // Sequential calls - blocks UI unnecessarily
+    const score1 = await scoreAnswer(answer1);
+    const score2 = await scoreAnswer(answer2);
+    const score3 = await scoreAnswer(answer3);
+  
+  prefer: |
+    // Concurrent calls - better UX
+    const scores = await Promise.allSettled([
+      scoreAnswer(answer1),
+      scoreAnswer(answer2), 
+      scoreAnswer(answer3)
+    ]);

@@ -1,0 +1,17 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Rule: Minimal Code Changes
+description: >
+  Always analyze existing codebase and make the smallest possible changes to achieve goals,
+  avoiding unnecessary refactoring, duplication, or creating new components when possible.
+
+do:
+  prefer:
+    - "Analyze existing code to understand available functionality before making changes"
+    - "Identify the minimal code modification that achieves the goal"
+    - "Avoid refactoring unrelated code"
+    - "Choose the approach that touches the least code"
+    - "Never duplicate functionality already implemented"
