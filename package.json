@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "description": "A Next.js boilerplate optimized for Cursor AI development with comprehensive rules and best practices.",
   "main": "index.js",
-  "repository": "https://github.com/UnitedEffects/nextjs-cursor-boilerplate.git",
+  "repository": "https://github.com/theBoEffect/nextjs-cursor-boilerplate.git",
   "author": "Your Name <your.email@example.com>",
   "license": "MIT",
   "private": true,
